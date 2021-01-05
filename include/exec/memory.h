@@ -149,6 +149,9 @@ typedef struct IOMMUTLBEvent {
 /* RAM is a persistent kind memory */
 #define RAM_PMEM (1 << 5)
 
+/* RAM that isn't accessible through normal means. */
+#define RAM_PROTECTED (1 << 6)
+
 static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
                                        IOMMUNotifierFlag flags,
                                        hwaddr start, hwaddr end,
@@ -989,6 +992,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
  * @name: the name of the region.
  * @size: size of the region.
  * @share: %true if memory must be mmaped with the MAP_SHARED flag
+ * @protected: %true if memory is protected and isn't treated like normal RAM
  * @fd: the fd to mmap.
  * @errp: pointer to Error*, to store an error if it happens.
  *
@@ -1000,8 +1004,10 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
                                     const char *name,
                                     uint64_t size,
                                     bool share,
+                                    bool protected,
                                     int fd,
                                     Error **errp);
+
 #endif
 
 /**
@@ -1286,6 +1292,16 @@ static inline bool memory_region_is_romd(MemoryRegion *mr)
 {
     return mr->rom_device && mr->romd_mode;
 }
+
+/**
+ * memory_region_is_protected: check whether a memory region is protected
+ *
+ * Returns %true if a memory region is protected RAM and cannot be accessed
+ * via standard mechanisms, e.g. DMA.
+ *
+ * @mr: the memory region being queried
+ */
+bool memory_region_is_protected(MemoryRegion *mr);
 
 /**
  * memory_region_get_iommu: check whether a memory region is an iommu
