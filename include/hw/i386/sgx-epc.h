@@ -13,6 +13,7 @@
 #define QEMU_SGX_EPC_H
 
 #include "sysemu/hostmem.h"
+#include "qapi/qapi-types-misc.h"
 
 #define TYPE_SGX_EPC "sgx-epc"
 #define SGX_EPC(obj) \
@@ -58,6 +59,7 @@ typedef struct SGXEPCState {
 extern int sgx_epc_enabled;
 
 int sgx_epc_get_section(int section_nr, uint64_t *addr, uint64_t *size);
+SGXInfo *sgx_get_info(void);
 
 static inline bool sgx_epc_above_4g(SGXEPCState *sgx_epc)
 {
